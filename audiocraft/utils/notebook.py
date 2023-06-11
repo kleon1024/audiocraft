@@ -13,8 +13,10 @@ except ImportError:
 
 import torch
 
+from typing import List
 
-def display_audio(samples: torch.Tensor, sample_rate: int):
+
+def display_audio(prompts: List[str], samples: torch.Tensor, sample_rate: int):
     """Renders an audio player for the given audio samples.
 
     Args:
@@ -28,5 +30,9 @@ def display_audio(samples: torch.Tensor, sample_rate: int):
     if samples.dim() == 2:
         samples = samples[None, ...]
 
-    for audio in samples:
-        ipd.display(ipd.Audio(audio, rate=sample_rate))
+    for prompt, audio in zip(prompts, samples):
+        a = ipd.Audio(audio, rate=sample_rate)
+        ipd.display(a)
+        filename = prompt.lower().replace(' ', '-').replace(',', '')
+        with open(f'{filename}.wav', 'wb') as f:
+            f.write(a.data)
